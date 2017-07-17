@@ -41,8 +41,8 @@
             </div>
             <div class="clearfix"></div>
             <br>
-            <div class="col-lg-6 col-lg-offset-3">
-                <button class="btn btn-default" id="submit">Submit</button>
+            <div class="col-lg-6 col-lg-offset-3 text-center">
+                <button class="btn btn-primary" id="submit">Submit</button>
             </div>
         </form>
     </div>
