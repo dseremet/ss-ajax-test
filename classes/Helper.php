@@ -18,18 +18,20 @@ class Helper
 		return explode(' ', $string);
 	}
 
-	public function array_pop(&$array){
+	public function array_pop(&$array)
+	{
 		$return = array_pop($array);
-		if($return!='')
+		if ($return != '')
 			return $return;
 		else
 			return $this->array_pop($array);
 
 	}
 
-	public function array_shift(&$array){
+	public function array_shift(&$array)
+	{
 		$return = array_shift($array);
-		if($return!='')
+		if ($return != '')
 			return $return;
 		else
 			return $this->array_shift($array);

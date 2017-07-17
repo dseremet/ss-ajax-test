@@ -4,8 +4,6 @@ include_once 'Helper.php';
 
 class Processor
 {
-	private $return = [];
-
 	public function processString($string)
 	{
 		$helper = new Helper();
@@ -14,6 +12,7 @@ class Processor
 		$text = html_entity_decode($string['text']);
 
 		$separated = $helper->clearString($text, []);
+
 		$return['email'] = $this->getEmail($separated);
 		$return['phone'] = $this->getPhone($separated);
 
@@ -35,7 +34,6 @@ class Processor
 		return '';
 	}
 
-	//TODO: check if phone is separated and in different parts of array
 	private function getPhone($separated)
 	{
 		$helper = new Helper();
