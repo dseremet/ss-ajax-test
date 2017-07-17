@@ -40,20 +40,19 @@ class Processor
 	{
 		$helper = new Helper();
 
-		$partialParsing = $parsedPhone = false;
+		$partialParsing = false;
+		$parsedPhone = false;
 		$phone = '';
-		foreach ($separated as $key => $value) {
 
+		foreach ($separated as $key => $value) {
 			$p = $helper->cleanPhone($value);
+
 			if (!is_numeric($p))
 				continue;
 
 			if (strlen($p) == 10) {
 				$phone = $value;
 				$parsedPhone = true;
-			} elseif (strlen($p) == 3) {
-				$phone = $value;
-				$partialParsing = true;
 			} elseif ($partialParsing) {
 				$strPhone = $helper->cleanPhone($phone);
 				if (strlen($strPhone) == 3 && (strlen($p) == 3 || strlen($p) == 7)) {
@@ -61,8 +60,15 @@ class Processor
 				} elseif (strlen($strPhone) == 6 && strlen($p) == 4) {
 					$phone .= ' ' . $value;
 				}
+			} elseif (strlen($p) == 3) {
+				$phone = $value;
+				$partialParsing = true;
 			}
-			if ($parsedPhone || strlen($helper->cleanPhone($phone)) == 10)
+
+			if (strlen($helper->cleanPhone($phone)) == 10)
+				$parsedPhone = true;
+
+			if ($parsedPhone)
 				break;
 		}
 

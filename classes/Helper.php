@@ -4,7 +4,7 @@ class Helper
 {
 	public function cleanPhone($phone)
 	{
-		return preg_replace('/[^A-Za-z0-9\-]/', '', str_replace('-', '', $phone));
+		return preg_replace('/[^A-Za-z0-9\-]/', '', str_replace('-', '', trim($phone)));
 	}
 
 	public function clearString($string, $array)
