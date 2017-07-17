@@ -44,7 +44,7 @@
 </nav>
 <div class="content">
     <div id="form">
-        <form action="" id="string-form">
+        <form action="" id="string-form" autocomplete="off">
             <div class="col-sm-6 col-sm-offset-3">
                 <label for="text">String</label>
                 <input type="text" class="form-control" id="text" name="text" placeholder="Enter string">

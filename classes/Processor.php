@@ -1,29 +1,25 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: damirseremet
- * Date: 16/07/2017
- * Time: 16:37
- */
+include_once 'Helper.php';
+
 class Processor
 {
 	private $return = [];
 
 	public function processString($string)
 	{
+		$helper = new Helper();
 		if (!isset($string['text']) || !$string['text'])
 			return json_encode(['success' => false, 'error' => 'String is missing']);
 		$text = html_entity_decode($string['text']);
 
-
-		$separated = $this->clearString($text, []);
+		$separated = $helper->clearString($text, []);
 		$return['email'] = $this->getEmail($separated);
 		$return['phone'] = $this->getPhone($separated);
 
-		$separated = $this->clearString($text, [$return['email'], $return['phone']]);
+		$separated = $helper->clearString($text, [$return['email'], $return['phone']]);
 		$return['name'] = $this->getName($separated);
-		$separated = $this->clearString($text, [$return['email'], $return['phone'], $return['name']]);
+		$separated = $helper->clearString($text, [$return['email'], $return['phone'], $return['name']]);
 		$return['address'] = $this->getAddress($separated);
 
 		return json_encode(['success' => true, 'message' => $return]);
@@ -42,11 +38,13 @@ class Processor
 	//TODO: check if phone is separated and in different parts of array
 	private function getPhone($separated)
 	{
+		$helper = new Helper();
+
 		$partialParsing = $parsedPhone = false;
 		$phone = '';
 		foreach ($separated as $key => $value) {
 
-			$p = $this->cleanPhone($value);
+			$p = $helper->cleanPhone($value);
 			if (!is_numeric($p))
 				continue;
 
@@ -57,14 +55,14 @@ class Processor
 				$phone = $value;
 				$partialParsing = true;
 			} elseif ($partialParsing) {
-				$strPhone = $this->cleanPhone($phone);
+				$strPhone = $helper->cleanPhone($phone);
 				if (strlen($strPhone) == 3 && (strlen($p) == 3 || strlen($p) == 7)) {
 					$phone .= ' ' . $value;
 				} elseif (strlen($strPhone) == 6 && strlen($p) == 4) {
 					$phone .= ' ' . $value;
 				}
 			}
-			if ($parsedPhone || strlen($this->cleanPhone($phone)) == 10)
+			if ($parsedPhone || strlen($helper->cleanPhone($phone)) == 10)
 				break;
 		}
 
@@ -73,38 +71,31 @@ class Processor
 
 	private function getName($separated)
 	{
-		$v = array_pop($separated);
+		$helper = new Helper();
+
+		$v = $helper->array_pop($separated);
 		$name_at_beginning = false;
+
 		if (strlen($v) == 5 && is_numeric($v))
 			$name_at_beginning = true;
 
 		if (!$name_at_beginning) {
-			$first_name = array_pop($separated);
+			$first_name = $helper->array_pop($separated);
 			return $first_name . ' ' . $v;
 		}
-		$first_name = array_shift($separated);
-		$last_name = array_shift($separated);
-		return $first_name . ' ' . $last_name;
+
+		$name = '';
+		foreach ($separated as $v) {
+			if (is_numeric($v))
+				break;
+			$name .= ' ' . $v;
+		}
+
+		return trim($name);
 	}
 
 	private function getAddress($separated)
 	{
 		return implode(' ', $separated);
-	}
-
-	private function cleanPhone($phone)
-	{
-		return preg_replace('/[^A-Za-z0-9\-]/', '', str_replace('-', '', $phone));
-	}
-
-	private function clearString($string, $array)
-	{
-		$string = trim($string);
-		if (count($array)) {
-			foreach ($array as $ar) {
-				$string = str_replace($ar, '', $string);
-			}
-		}
-		return explode(' ', $string);
 	}
 }
