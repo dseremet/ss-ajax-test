@@ -1,3 +1,11 @@
+footer {
+    position: fixed;
+    height: 30px;
+    bottom: 0;
+    padding: 5px 10px;
+    width: 100%;
+}
+
 #loader{
     position:relative;
     width:234px;

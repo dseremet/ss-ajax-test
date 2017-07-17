@@ -92,7 +92,10 @@
 
     </div>
 </div>
-
+<footer class="fixed-bottom">
+    <span class="pull-left">Parse Test</span>
+    <span class="pull-right">Damir Šeremet</span>
+</footer>
 
 <script type="text/javascript" src="js/jquery-3.2.1.min.js"></script>
 <script type="text/javascript" src="js/bootstrap.js"></script>
