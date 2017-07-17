@@ -16,11 +16,14 @@ class Processor
 			return json_encode(['success' => false, 'error' => 'String is missing']);
 		$text = html_entity_decode($string['text']);
 
-		$separated = explode(' ', $text);
 
+		$separated = $this->clearString($text, []);
 		$return['email'] = $this->getEmail($separated);
 		$return['phone'] = $this->getPhone($separated);
+
+		$separated = $this->clearString($text, [$return['email'], $return['phone']]);
 		$return['name'] = $this->getName($separated);
+		$separated = $this->clearString($text, [$return['email'], $return['phone'], $return['name']]);
 		$return['address'] = $this->getAddress($separated);
 
 		return json_encode(['success' => true, 'message' => $return]);
@@ -39,29 +42,69 @@ class Processor
 	//TODO: check if phone is separated and in different parts of array
 	private function getPhone($separated)
 	{
-		$isPhone = $parsedPhone = false;
+		$partialParsing = $parsedPhone = false;
 		$phone = '';
 		foreach ($separated as $key => $value) {
-			$p = preg_replace('/[^A-Za-z0-9\-]/', '', $value);
-			if ((strlen($p) == 3 || strlen($p) == 10) && is_numeric($p)) {
-				$phone = $value;
-			}
 
+			$p = $this->cleanPhone($value);
+			if (!is_numeric($p))
+				continue;
+
+			if (strlen($p) == 10) {
+				$phone = $value;
+				$parsedPhone = true;
+			} elseif (strlen($p) == 3) {
+				$phone = $value;
+				$partialParsing = true;
+			} elseif ($partialParsing) {
+				$strPhone = $this->cleanPhone($phone);
+				if (strlen($strPhone) == 3 && (strlen($p) == 3 || strlen($p) == 7)) {
+					$phone .= ' ' . $value;
+				} elseif (strlen($strPhone) == 6 && strlen($p) == 4) {
+					$phone .= ' ' . $value;
+				}
+			}
+			if ($parsedPhone || strlen($this->cleanPhone($phone)) == 10)
+				break;
 		}
 
 		return $phone;
 	}
 
-	//TODO: cleaned string, check if name is in the end (after zip code) or at the beginning
 	private function getName($separated)
 	{
+		$v = array_pop($separated);
+		$name_at_beginning = false;
+		if (strlen($v) == 5 && is_numeric($v))
+			$name_at_beginning = true;
 
+		if (!$name_at_beginning) {
+			$first_name = array_pop($separated);
+			return $first_name . ' ' . $v;
+		}
+		$first_name = array_shift($separated);
+		$last_name = array_shift($separated);
+		return $first_name . ' ' . $last_name;
 	}
 
-	//TODO: clean the string from retrieved values and get trimmed address
 	private function getAddress($separated)
 	{
-
+		return implode(' ', $separated);
 	}
 
+	private function cleanPhone($phone)
+	{
+		return preg_replace('/[^A-Za-z0-9\-]/', '', str_replace('-', '', $phone));
+	}
+
+	private function clearString($string, $array)
+	{
+		$string = trim($string);
+		if (count($array)) {
+			foreach ($array as $ar) {
+				$string = str_replace($ar, '', $string);
+			}
+		}
+		return explode(' ', $string);
+	}
 }

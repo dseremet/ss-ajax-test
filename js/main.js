@@ -17,10 +17,10 @@ $(function () {
             }
             if (response.success) {
                 $("#message").slideDown();
-                $("#message .r_name").text(response.name);
-                $("#message .r_phone").text(response.phone);
-                $("#message .r_email").text(response.email);
-                $("#message .r_address").text(response.address);
+                $("#message .r_name").text(response.message.name);
+                $("#message .r_phone").text(response.message.phone);
+                $("#message .r_email").text(response.message.email);
+                $("#message .r_address").text(response.message.address);
             }
         }, 'json').fail(function () {
             $("#error").text("Error has occurred");
